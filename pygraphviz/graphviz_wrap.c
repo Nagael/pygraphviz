@@ -3278,7 +3278,7 @@ SWIGINTERN PyObject *_wrap_agwrite(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
       mode_byte_obj2 = PyUnicode_AsUTF8String(mode_obj2);
       
       mode2 = PyBytes_AsString(mode_byte_obj2);
-      arg2 = fdopen(fd2, mode2);
+      arg2 = fdopen(dup(fd2), mode2);
       Py_XDECREF(mode_obj2);
       Py_XDECREF(mode_byte_obj2);
     }
@@ -5056,7 +5056,7 @@ SWIGINTERN PyObject *_wrap_gvRender(PyObject *SWIGUNUSEDPARM(self), PyObject *ar
         mode_byte_obj4 = PyUnicode_AsUTF8String(mode_obj4);
         
         mode4 = PyBytes_AsString(mode_byte_obj4);
-        arg4 = fdopen(fd4, mode4);
+        arg4 = fdopen(dup(fd4), mode4);
         Py_XDECREF(mode_obj4);
         Py_XDECREF(mode_byte_obj4);
       }
