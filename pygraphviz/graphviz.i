@@ -15,7 +15,7 @@
         mode_byte_obj = PyUnicode_AsUTF8String(mode_obj);
 
         mode = PyBytes_AsString(mode_byte_obj);
-        $1 = fdopen(fd, mode);
+        $1 = fdopen(dup(fd), mode);
         Py_XDECREF(mode_obj);
         Py_XDECREF(mode_byte_obj);
     }
@@ -93,6 +93,7 @@
 
 %exception agread {
   $action
+  fclose(arg1);
   if (!result) {
      PyErr_SetString(PyExc_ValueError,"agread: bad input data");
      return NULL;
