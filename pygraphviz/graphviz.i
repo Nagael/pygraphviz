@@ -4,37 +4,35 @@
 #include "graphviz/cgraph.h"
 #include "graphviz/gvc.h"
 %}
+%{
+  FILE* convert_fd_from_python(PyObject* input,int duplicate) {
+    // work around to get hold of FILE*
+    int fd = PyObject_AsFileDescriptor(input);
+
+    PyObject* mode_obj = PyObject_GetAttrString(input, "mode");
+    PyObject* mode_byte_obj = PyUnicode_AsUTF8String(mode_obj);
+
+    char* mode = PyBytes_AsString(mode_byte_obj);
+    if(duplicate)
+      fd = dup(fd);
+    FILE* result = fdopen(fd, mode);
+    Py_XDECREF(mode_obj);
+    Py_XDECREF(mode_byte_obj);
+    return result;
+  }
+%}
 
 %typemap(in) FILE* input_file (int fd, PyObject *mode_obj, PyObject *mode_byte_obj, char *mode) {
     if ($input == Py_None) { $1 = NULL; }
     else {
-        // work around to get hold of FILE*
-        fd = PyObject_AsFileDescriptor($input);
-
-        mode_obj = PyObject_GetAttrString($input, "mode");
-        mode_byte_obj = PyUnicode_AsUTF8String(mode_obj);
-
-        mode = PyBytes_AsString(mode_byte_obj);
-	fd = dup(fd);
-        $1 = fdopen(fd, mode);
-        Py_XDECREF(mode_obj);
-        Py_XDECREF(mode_byte_obj);
+      $1 = convert_fd_from_python($input, 1);
     }
 }
 
 %typemap(in) FILE* output_file (int fd, PyObject *mode_obj, PyObject *mode_byte_obj, char *mode) {
     if ($input == Py_None) { $1 = NULL; }
     else {
-        // work around to get hold of FILE*
-        fd = PyObject_AsFileDescriptor($input);
-
-        mode_obj = PyObject_GetAttrString($input, "mode");
-        mode_byte_obj = PyUnicode_AsUTF8String(mode_obj);
-
-        mode = PyBytes_AsString(mode_byte_obj);
-        $1 = fdopen(fd, mode);
-        Py_XDECREF(mode_obj);
-        Py_XDECREF(mode_byte_obj);
+      $1 = convert_fd_from_python($input, 0);
     }
 }
 
